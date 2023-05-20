@@ -1,0 +1,144 @@
+version: "2"
+services:
+  jellyfin:
+    image: ghcr.io/linuxserver/jellyfin:latest
+    container_name: jellyfin
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=UTC
+      - UMASK_SET=<022> #optional
+    volumes:
+      - ./volumes/jellyfin/config:/config
+      - ./media/tvshows:/data/tvshows
+      - ./media/movies:/data/movies
+      - ./media/anime:/data/anime
+      - /opt/vc/lib:/opt/vc/lib #optional
+      - ./downloads:/downloads
+    ports:
+      - 8096:8096
+    restart: unless-stopped
+    
+  jackett:
+    image: linuxserver/jackett:latest
+    container_name: jackett
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=UTC
+      - AUTO_UPDATE=true #optional
+      # - RUN_OPTS=<run options here> #optional
+    volumes:
+      - ./volumes/jackett/config:/config
+      - ./downloads:/downloads
+    ports:
+      - 9117:9117
+    restart: unless-stopped
+    
+  qbittorrent:
+      image: linuxserver/qbittorrent:latest
+      container_name: qbittorrent
+      depends_on:
+        - vpn
+      network_mode: service:vpn
+      environment:
+        - PUID=1000
+        - PGID=1000
+        - UMASK_SET=022
+        - WEBUI_PORT=15080
+      volumes:
+        - ./volumes/qbittorrent/config:/config
+        - ./downloads:/downloads
+      restart: unless-stopped
+#      ports:
+#        - 6881:6881
+#        - 6881:6881/udp
+#        - 15080:15080
+#        - 1080:1080
+        
+  bazarr:
+    image: linuxserver/bazarr:latest
+    container_name: bazarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=UTC
+      - UMASK_SET=022 #optional
+    volumes:
+      - ./volumes/bazarr/config:/config
+      - ./media/movies:/movies
+      - ./media/tvshows:/tv
+      - ./media/anime:/anime
+    ports:
+      - 6767:6767
+    restart: unless-stopped
+    
+  radarr:
+    image: linuxserver/radarr:latest
+    container_name: radarr
+    environment:
+      - PUID=0
+      - PGID=0
+      - TZ=UTC
+      - UMASK=022 #optional
+    volumes:
+      - ./volumes/radarr/config:/config
+      - ./media/movies:/movies
+      - ./downloads:/downloads
+    ports:
+      - 7878:7878
+    restart: unless-stopped
+    
+  sonarr:
+    image: linuxserver/sonarr:latest
+    container_name: sonarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=UTC
+      - UMASK_SET=022 #optional
+    volumes:
+      - ./volumes/sonarr/data:/config
+      - ./media/tvshows:/tv
+      - ./media/anime:/anime
+      - ./downloads:/downloads
+    ports:
+      - 8989:8989
+    restart: unless-stopped
+
+  vpn:
+    container_name: vpn-gateway
+    image: dperson/openvpn-client:latest
+    restart: unless-stopped
+    ports:            # List all port numbers of the containers that you would like to put behind VPN. Remember, these ports can only exist in a single place inside entire docker-compose.yml file.
+      - 90:80         # Redirecting to port 90 as 80 we will need this at some point for reverseproxy traefik. 
+      - 6881:6881
+      - 6881:6881/udp
+      - 15080:15080
+      - 1080:1080
+    dns:              # Use VPN provided DNS IPs if you have them otherwise leave as is.
+      - 8.8.8.8
+      - 8.8.4.4
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - '/dev/net/tun:/dev/net/tun:rwm'
+    environment:
+      FIREWALL: ''    # If you use different VPN ports then default 1194 add them in here, otherwise leave it empty as is.
+     #VPN 'server_address;user;password;port'    # Configure VPN server address, authentication and port if needed by your VPN provider (port value is optional) we will use an external config file for this, leave commented as is.
+      PUID: 1000
+      PGID: 1000
+      TZ: UTC+0
+      ROUTE: '192.168.0.0/16'    # Specify subnet of your home LAN in order to connect into the container behind VPN - if you don't, containers will work but you wont be able to connect to them locally.
+    networks:
+      - default
+    read_only: true
+    tmpfs:
+      - /run
+      - /tmp
+    security_opt:
+      - label:disable
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./vpn:/vpn
