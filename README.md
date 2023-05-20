@@ -1,6 +1,5 @@
 # Docker_Compose_RPi
-Docker Compose for Raspberry Pi Server
- Easy Raspberry Pi Server set up for Media and Website server
+Docker Compose for Easy Raspberry Pi Server set up for Media and Website server
  1. Install Docker on raspberry pi
 	 * Run the following two commands to update both the package list and the packages.
 		```
