@@ -1,0 +1,32 @@
+version: '2'
+
+services:
+
+  wordpress:
+    image: arm64v8/wordpress:latest
+    restart: always
+
+    ports:
+      - 8080:80
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: admin
+      WORDPRESS_DB_PASSWORD: 23258189
+    volumes:
+      - wordpress:/var/www/html
+
+  db:
+    image: mariadb
+    restart: always
+    environment:
+      MYSQL_DATABASE: wordpress
+      MYSQL_ROOT_PASSWORD: 23258189
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: 23258189
+
+    volumes:
+      - db:/var/lib/mysql
+
+volumes:
+  wordpress:
+  db:
