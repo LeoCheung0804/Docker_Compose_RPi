@@ -32,7 +32,7 @@ Docker Compose for Easy Raspberry Pi Server set up for Media and Website server
 	sudo mv wordpress.yml docker-compose.yml
 	sudo docker-compose up -d
 	```
- 6. For hosting a Linux Media server, use lmds.yml
+ 6. For hosting a Linux Media server, download lmds.yml and run the following command
 	```
 	sudo mv lmds.yml docker-compose.yml
 	sudo docker-compose up -d
