@@ -28,3 +28,5 @@ Docker Compose for Raspberry Pi Server
       sudo docker run -d -p 9000:9000 --name=portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce:latest
 	```
  4. Use the yml on Portainer UI
+ 5. For hosting a wordpress website, use wordpress.yml
+ 6. For hosting a Linux Media server, use lmds.yml
