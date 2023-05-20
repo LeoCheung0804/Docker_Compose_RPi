@@ -26,12 +26,14 @@ Docker Compose for Easy Raspberry Pi Server set up for Media and Website server
 	```
 	sudo docker run -d -p 9000:9000 --name=portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce:latest
 	```
- 4. Use the yml by running the following command. or on Portainer UI to build a stack
- 5. For hosting a wordpress website, use wordpress.yml
+ 4. Use the yml by running the following command. or use Portainer UI to build a stack
+ 5. For hosting a wordpress website, download wordpress.yml and run the following command
 	```
-	sudo docker compose -f wordpress.yml 
+	sudo mv wordpress.yml docker-compose.yml
+	sudo docker-compose up -d
 	```
  6. For hosting a Linux Media server, use lmds.yml
 	```
-	sudo docker compose -f lmds.yml
+	sudo mv lmds.yml docker-compose.yml
+	sudo docker-compose up -d
 	```
